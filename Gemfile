@@ -10,6 +10,7 @@ gem "importmap-rails", "1.1.5"
 gem "turbo-rails",     "1.4.0"
 gem "stimulus-rails",  "1.2.1"
 gem "jbuilder",        "2.11.5"
+gem "bcrypt",          "3.1.18"
 gem "puma",            "5.6.8"
 gem "bootsnap",        "1.16.0", require: false
 gem "bootstrap-sass",  "3.4.1"
