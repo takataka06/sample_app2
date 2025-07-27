@@ -7,4 +7,10 @@ class User < ApplicationRecord
                     uniqueness: true#大文字・小文字を区別せずに、emailが重複してないかチェックする
   has_secure_password
   validates :password, presence: true, length: { minimum: 6 }
+
+  def User.digest(string)
+    cost = ActiveModel::SecurePassword.min_cost ? BCrypt::Engine::MIN_COST :
+                                                  BCrypt::Engine.cost
+    BCrypt::Password.create(string, cost: cost)
+  end
 end
