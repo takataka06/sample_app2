@@ -6,9 +6,11 @@ class UsersController < ApplicationController
     @user = User.find(params[:id])
   end
   def create
-    @user = User.new(user_params)    # 実装は終わっていないことに注意!
+    @user = User.new(user_params)   
     if @user.save
-      reset_session
+      reset_session # ログインの直前に必ずこれを書くこと
+      # ユーザーが保存された後にセッションをリセットする
+      # これにより、セッションのIDが変更され、セキュリティが向上する
       log_in @user
       # 保存の成功をここで扱う。
       flash[:success] = "Welcome to the Sample App!" # メッセージを追加

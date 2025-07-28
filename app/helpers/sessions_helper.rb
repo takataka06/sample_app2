@@ -6,10 +6,22 @@ module SessionsHelper
   # 現在ログイン中のユーザーを返す（いる場合）
 
   def current_user
-    if session[:user_id]# セッションに user_id が入ってたら（＝ログインしてたら）、
-      @current_user ||= User.find_by(id: session[:user_id])#そのIDをもとにユーザー情報をDBから探して返す。
-      #しかも、一度探したら次回以降はキャッシュした値を再利用する。@current_user で呼び出すときは、毎回DBを参照しないから
+    if (user_id = session[:user_id])#（ユーザーIDにユーザーIDのセッションを代入した結果）ユーザーIDのセッションが存在すれば
+      @current_user ||= User.find_by(id: user_id) # session[:user_id] が存在する場合、@current_user を設定し、User.find_by(id: user_id) でユーザーを取得
+    elsif (user_id = cookies.encrypted[:user_id])
+      user = User.find_by(id: user_id)
+      if user && user.authenticated?(cookies[:remember_token])
+        log_in user
+        @current_user = user
+      end
     end
+  end
+
+  #ユーザーIDと記憶トークンの永続cookiesを作成します
+  def remember(user)
+    user.remember # remember メソッドを呼び出して、remember_token を生成し、remember_digest を更新する。
+    cookies.permanent.encrypted[:user_id] = user.id 
+    cookies.permanent[:remember_token] = user.remember_token
   end
 
   # ユーザーがログインしていればtrue、その他ならfalseを返す
