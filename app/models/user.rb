@@ -22,8 +22,13 @@ class User < ApplicationRecord
     self.remember_token = User.new_token #これは DBには保存しない。後で cookie に入れる用に手元（インスタンス）で保持するだけ。
     update_attribute(:remember_digest, User.digest(remember_token)) #いま作った トークンをハッシュ化（digest化） して、DBカラム remember_digest に保存する。
   end
-  # 記憶トークンと記憶ダイジェストを比較する
+  # 記憶トークンと記憶ダイジェストを比較する # 渡されたトークンがダイジェストと一致したらtrueを返す
   def authenticated?(remember_token)
+    return false if remember_digest.nil? # remember_digest が nil の場合は false を返す
     BCrypt::Password.new(remember_digest).is_password?(remember_token)
+  end
+  # ユーザーのログイン情報を破棄する
+  def forget
+    update_attribute(:remember_digest, nil)
   end
 end

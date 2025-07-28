@@ -5,7 +5,7 @@ class SessionsController < ApplicationController
     user = User.find_by(email: params[:session][:email].downcase)
     if user && user.authenticate(params[:session][:password])
       reset_session      # ログインの直前に必ずこれを書くこと
-      remember user
+      params[:session][:remember_me] == '1' ? remember(user) : forget(user) #checkされたら永続ログインそれ以外なら無効か
       log_in user
       redirect_to user
       # ユーザーログイン後にユーザー情報のページにリダイレクトする
@@ -16,7 +16,7 @@ class SessionsController < ApplicationController
     end
   end
   def destroy
-    log_out
+    log_out if logged_in? # ログインしている場合はログアウトする
     redirect_to root_url, status: :see_other
   end
 end
