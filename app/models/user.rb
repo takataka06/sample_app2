@@ -7,7 +7,7 @@ class User < ApplicationRecord
                     format: { with: VALID_EMAIL_REGEX },
                     uniqueness: true#大文字・小文字を区別せずに、emailが重複してないかチェックする
   has_secure_password
-  validates :password, presence: true, length: { minimum: 6 }
+  validates :password, presence: true, length: { minimum: 6 },allow_nil: true
 
   def User.digest(string) 
     cost = ActiveModel::SecurePassword.min_cost ? BCrypt::Engine::MIN_COST :
@@ -21,6 +21,7 @@ class User < ApplicationRecord
   def remember
     self.remember_token = User.new_token #これは DBには保存しない。後で cookie に入れる用に手元（インスタンス）で保持するだけ。
     update_attribute(:remember_digest, User.digest(remember_token)) #いま作った トークンをハッシュ化（digest化） して、DBカラム remember_digest に保存する。
+    remember_digest 
   end
   # 記憶トークンと記憶ダイジェストを比較する # 渡されたトークンがダイジェストと一致したらtrueを返す
   def authenticated?(remember_token)
@@ -30,5 +31,10 @@ class User < ApplicationRecord
   # ユーザーのログイン情報を破棄する
   def forget
     update_attribute(:remember_digest, nil)
+  end
+  # セッションハイジャック防止のためにセッショントークンを返す
+  # この記憶ダイジェストを再利用しているのは単に利便性のため
+  def session_token
+    remember_digest || remember
   end
 end
