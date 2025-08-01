@@ -65,6 +65,11 @@ class User < ApplicationRecord
   def password_reset_expired?
     reset_sent_at < 2.hours.ago # パスワード再設定の有効期限を2時間に設定。設定時間が現在時刻より2時間以上前
   end
+  # 試作feedの定義
+  # 完全な実装は次章の「ユーザーをフォローする」を参照
+  def feed
+    Micropost.where("user_id = ?", id)
+  end
   private
 
     # メールアドレスをすべて小文字にする
