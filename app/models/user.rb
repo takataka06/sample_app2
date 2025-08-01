@@ -9,6 +9,7 @@ class User < ApplicationRecord
                     format: { with: VALID_EMAIL_REGEX },
                     uniqueness: true#大文字・小文字を区別せずに、emailが重複してないかチェックする
   has_secure_password
+  has_many :microposts, dependent: :destroy
   validates :password, presence: true, length: { minimum: 6 },allow_nil: true
 
   def User.digest(string) 

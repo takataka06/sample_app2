@@ -9,7 +9,7 @@ class PasswordResetsTest < ActionDispatch::IntegrationTest
   end
 end
 
-class ForgotPasswordFormTest < PasswordResets
+class ForgotPasswordFormTest < PasswordResetsTest
 
   test "password reset path" do
     get new_password_reset_path
@@ -25,7 +25,7 @@ class ForgotPasswordFormTest < PasswordResets
   end
 end
 
-class PasswordResetForm < PasswordResets
+class PasswordResetForm < PasswordResetsTest
 
   def setup
     super
