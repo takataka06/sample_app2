@@ -10,6 +10,14 @@ class User < ApplicationRecord
                     uniqueness: true#大文字・小文字を区別せずに、emailが重複してないかチェックする
   has_secure_password
   has_many :microposts, dependent: :destroy
+  has_many :active_relationships, class_name:  "Relationship",
+                                  foreign_key: "follower_id",
+                                  dependent:   :destroy
+  has_many :passive_relationships, class_name:  "Relationship",
+                                   foreign_key: "followed_id",
+                                   dependent:   :destroy
+  has_many :followers, through: :passive_relationships, source: :follower
+  has_many :following, through: :active_relationships, source: :followed
   validates :password, presence: true, length: { minimum: 6 },allow_nil: true
 
   def User.digest(string) 
@@ -58,6 +66,20 @@ class User < ApplicationRecord
     update_attribute(:reset_sent_at, Time.zone.now)
   end
 
+  # ユーザーをフォローする
+  def follow(other_user)
+    following << other_user unless self == other_user
+  end
+
+  # ユーザーをフォロー解除する
+  def unfollow(other_user)
+    following.delete(other_user)
+  end
+
+  # 現在のユーザーが他のユーザーをフォローしていればtrueを返す
+  def following?(other_user)
+    following.include?(other_user)
+  end
   # パスワード再設定のメールを送信する
   def send_password_reset_email
     UserMailer.password_reset(self).deliver_now
